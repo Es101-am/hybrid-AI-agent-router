@@ -94,6 +94,45 @@ flowchart LR
     R -->|Revise| P
 ```
 
+%% Unified Hybrid Router (Deterministic + Planner)
+```mermaid
+flowchart LR
+    A[Input] --> B[Classify Intent<br/>(intent, confidence, needs_multi_step)]
+    B --> C{Gate:<br/>confidence ≥ τ<br/>&& !needs_multi_step?}
+
+    %% Deterministic branch
+    C -->|Yes| D{Intent Switch}
+    D -->|Question| E1[AnswerHandler]
+    D -->|Request| E2[RequestHandler]
+    D -->|Complaint| E3[ComplaintHandler]
+    E1 --> Z[Response]
+    E2 --> Z
+    E3 --> Z
+
+    %% Planner branch
+    C -->|No| P[Planner (LLM)]
+    P --> X[Tool Executor]
+    X --> R[Critic (score ≥ threshold?)]
+    R -->|Approve| S[Safety Guard]
+    S -->|Pass| Z
+    S -->|Violation| D
+
+    R -->|Revise| P
+    P -. max_loops reached .-> F[Deterministic Fallback]
+    F --> D
+
+    %% Notes
+    classDef gate fill:#f9f,stroke:#333,stroke-width:1px,color:#111;
+    classDef det  fill:#e0f7fa,stroke:#00796b,stroke-width:1px,color:#004d40;
+    classDef plan fill:#fff3e0,stroke:#e65100,stroke-width:1px,color:#bf360c;
+    classDef safe fill:#ede7f6,stroke:#5e35b1,stroke-width:1px,color:#311b92;
+
+    class C gate
+    class D,E1,E2,E3,F det
+    class P,X,R plan
+    class S safe
+```
+
 ## How to Compare
 
 Toggle in config.yaml:
