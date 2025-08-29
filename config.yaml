@@ -1,0 +1,24 @@
+# ================================
+# Application Configuration
+# ================================
+
+app:
+  name: "HybridRouter"
+  model: "gpt-4o"          # Responses API model
+  tau: 0.85                # gate for deterministic branch
+  temperature: 0.0
+  clarify_on_low_conf: true
+
+hybrid:
+  enabled: true
+  max_loops: 2             # Planner→Executor→Critic cycles
+  planner_budget: 3        # max tool calls planner may propose in one plan
+  critic_threshold: 0.6    # pass if score >= threshold
+  ask_before_side_effects: true
+
+openai:
+  # Prefer env var OPENAI_API_KEY; if you want, you can put a key here.
+  api_key: ""         # your OpenAI API key
+  
+logging:
+  level: "INFO"           # DEBUG | INFO | WARNING | ERROR
