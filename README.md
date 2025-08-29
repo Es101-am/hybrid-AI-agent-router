@@ -94,35 +94,6 @@ flowchart LR
     R -->|Revise| P
 ```
 
-%% Unified Hybrid Router (Deterministic + Planner)
-```mermaid
-flowchart LR
-    A[Input] --> B[Classify Intent (intent, confidence, needs_multi_step)]
-    B --> C{Gate: confidence >= tau AND not multi_step?}
-
-    %% Deterministic branch
-    C -->|Yes| D{Intent Switch}
-    D -->|Question| E1[AnswerHandler]
-    D -->|Request| E2[RequestHandler]
-    D -->|Complaint| E3[ComplaintHandler]
-    E1 --> Z[Response]
-    E2 --> Z
-    E3 --> Z
-
-    %% Planner branch
-    C -->|No| P[Planner]
-    P --> X[Tool Executor]
-    X --> R{Critic: approve >= threshold?}
-    R -->|Yes| S{Safety Guard}
-    S -->|Pass| Z
-    S -->|Violation| D
-    R -->|No (Revise)| P
-
-    %% Fallback when planner loops are exhausted
-    P -->|Max loops reached| F[Deterministic Fallback]
-    F --> D
-
-```
 
 ## How to Compare
 
