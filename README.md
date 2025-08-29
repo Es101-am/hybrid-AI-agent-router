@@ -97,8 +97,8 @@ flowchart LR
 %% Unified Hybrid Router (Deterministic + Planner)
 ```mermaid
 flowchart LR
-    A[Input] --> B[Classify Intent<br/>(intent, confidence, needs_multi_step)]
-    B --> C{Gate:<br/>confidence ≥ τ<br/>&& !needs_multi_step?}
+    A[Input] --> B[Classify Intent (intent, confidence, needs_multi_step)]
+    B --> C{Gate: confidence >= tau AND not multi_step?}
 
     %% Deterministic branch
     C -->|Yes| D{Intent Switch}
@@ -110,27 +110,18 @@ flowchart LR
     E3 --> Z
 
     %% Planner branch
-    C -->|No| P[Planner (LLM)]
+    C -->|No| P[Planner]
     P --> X[Tool Executor]
-    X --> R[Critic (score ≥ threshold?)]
-    R -->|Approve| S[Safety Guard]
+    X --> R{Critic: approve >= threshold?}
+    R -->|Yes| S{Safety Guard}
     S -->|Pass| Z
     S -->|Violation| D
+    R -->|No (Revise)| P
 
-    R -->|Revise| P
-    P -. max_loops reached .-> F[Deterministic Fallback]
+    %% Fallback when planner loops are exhausted
+    P -->|Max loops reached| F[Deterministic Fallback]
     F --> D
 
-    %% Notes
-    classDef gate fill:#f9f,stroke:#333,stroke-width:1px,color:#111;
-    classDef det  fill:#e0f7fa,stroke:#00796b,stroke-width:1px,color:#004d40;
-    classDef plan fill:#fff3e0,stroke:#e65100,stroke-width:1px,color:#bf360c;
-    classDef safe fill:#ede7f6,stroke:#5e35b1,stroke-width:1px,color:#311b92;
-
-    class C gate
-    class D,E1,E2,E3,F det
-    class P,X,R plan
-    class S safe
 ```
 
 ## How to Compare
